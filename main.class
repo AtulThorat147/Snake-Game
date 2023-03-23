@@ -1,0 +1,388 @@
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Codespaces
+Marketplace
+Explore
+ 
+
+/
+snake-game
+Public
+Fork your own copy of RakeshCherry/snake-game
+Code
+Issues
+Pull requests
+Actions
+Projects
+Security
+Insights
+Add files via upload
+ main
+RakeshCherry committed 5 days ago 
+1 parent 9583285
+commit 0af1ea6
+Show file tree Hide file tree
+Showing 14 changed files with 279 additions and 0 deletions.
+Filter changed files
+ 18  
+mini project/README.md
+Comment on this file
+Getting Started
+Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+
+Folder Structure
+The workspace contains two folders by default, where:
+
+src: the folder to maintain sources
+lib: the folder to maintain dependencies
+Meanwhile, the compiled output files will be generated in the bin folder by default.
+
+If you want to customize the folder structure, open .vscode/settings.json and update the related settings there.
+
+Dependency Management
+The JAVA PROJECTS view allows you to manage your dependencies. More details can be found here.
+
+ BIN +776 Bytes 
+mini project/bin/App.class
+Comment on this file
+Binary file not shown.
+ BIN +519 Bytes 
+mini project/bin/SnakeGame/Main.class
+Comment on this file
+Binary file not shown.
+ BIN +537 Bytes 
+mini project/bin/SnakeGame/frame.class
+Comment on this file
+Binary file not shown.
+ BIN +260 Bytes 
+mini project/bin/SnakeGame/mykey.class
+Comment on this file
+Binary file not shown.
+ BIN +1.13 KB 
+mini project/bin/SnakeGame/panel$myKey.class
+Comment on this file
+Binary file not shown.
+ BIN +4.4 KB 
+mini project/bin/SnakeGame/panel.class
+Comment on this file
+Binary file not shown.
+ BIN +630 Bytes 
+mini project/src/App.class
+Comment on this file
+Binary file not shown.
+ 13  
+mini project/src/App.java
+Comment on this file
+@@ -0,0 +1,13 @@
+import javax.swing.*;
+import java.awt.*;
+
+public class App {
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Sapling Session");
+        frame.setBounds(200, 200, 500, 500);
+        frame.getContentPane().setBackground(Color.lightGray);
+        frame.setVisible(true);
+    }
+
+}
+ 11  
+mini project/src/SnakeGame/Main.java
+Comment on this file
+@@ -0,0 +1,11 @@
+package SnakeGame;
+
+import javax.swing.JFrame;
+
+public class Main {
+
+    public static void main(String[] args) {
+        new frame();
+    }
+}
+3
+ 21  
+mini project/src/SnakeGame/frame.java
+Comment on this file
+@@ -0,0 +1,21 @@
+package SnakeGame;
+
+import javax.swing.*;
+
+public class frame extends JFrame {
+    // adding the panel to the frame
+    frame() {
+        this.add(new panel());
+
+        //
+        // naming the game
+        this.setTitle("SnakeGame");
+
+        // to take sure uniform window size
+        this.setResizable(false);
+        // to visibles the panel
+        this.setVisible(true);
+        // for resolution purpose we use this.pack
+        this.pack();
+    }
+}
+ 5  
+mini project/src/SnakeGame/mykey.java
+Comment on this file
+@@ -0,0 +1,5 @@
+package SnakeGame;
+
+public class mykey {
+
+}
+ BIN +2.84 KB 
+mini project/src/SnakeGame/panel.class
+Comment on this file
+Binary file not shown.
+ 211  
+mini project/src/SnakeGame/panel.java
+Comment on this file
+@@ -0,0 +1,211 @@
+package SnakeGame;
+
+import javax.swing.*;
+import javax.swing.Timer;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.net.http.WebSocket.Listener;
+import java.util.*;
+
+public class panel extends JPanel implements ActionListener {
+
+    static int width = 1200;
+    static int height = 600;
+    static int unit = 50;
+    // to specify time in which frame is displayed
+    Timer timer;
+    // declaring food location randamly
+    Random random;
+    int foodx, foody;
+
+    int score;
+    int length = 3;
+
+    char dir = 'R';
+
+    // to specify if the game has ended or not
+    boolean flag = false;
+
+    // to make the speed of the snake
+    static int delay = 160;
+
+    // creating the arrays to store x and y coordinates of the snake
+    int[] xsnake = new int[288];
+    int[] ysnake = new int[288];
+
+    panel() {
+        this.setPreferredSize(new Dimension(width, height));
+        this.setBackground(Color.LIGHT_GRAY);
+        // this commond allows keyboard input to be processed
+        this.setFocusable(true);
+        random = new Random();
+        // creating abstract class for input proccessing
+        this.addKeyListener(new myKey());
+
+        gamestart();
+    }
+
+    public void gamestart() {
+        spawnfood();
+        flag = true;
+        timer = new Timer(delay, this);
+        timer.start();
+    }
+
+    public void spawnfood() {
+
+        foodx = random.nextInt(width / unit) * unit;
+        foody = random.nextInt(height / unit) * unit;
+    }
+
+    public void paintComponent(Graphics graphic) {
+        super.paintComponent(graphic);
+        draw(graphic);
+    }
+
+    public void draw(Graphics graphic) {
+        if (flag == true) {
+            graphic.setColor(Color.RED);
+            graphic.fillOval(foodx, foody, unit, unit);
+
+            for (int i = 0; i < length; i++) {
+                if (i == 0) {
+                    graphic.setColor(Color.orange);
+                } else {
+                    graphic.setColor(Color.darkGray);
+                }
+                graphic.fillRect(xsnake[i], ysnake[i], unit, unit);
+            }
+
+            graphic.setColor(Color.BLUE);
+            graphic.setFont(new Font("Comic Sans", Font.BOLD, 40));
+            FontMetrics f = getFontMetrics(graphic.getFont());
+            graphic.drawString("Score:" + score, (width - f.stringWidth("Score:" + score)) / 2,
+                    graphic.getFont().getSize());
+
+        } else {
+            gameover(graphic);
+        }
+    }
+
+    public void gameover(Graphics graphic) {
+        // to display the score
+        graphic.setColor(Color.BLUE);
+        graphic.setFont(new Font("Comic Sans", Font.BOLD, 40));
+        FontMetrics f = getFontMetrics(graphic.getFont());
+        graphic.drawString("Score:" + score, (width - f.stringWidth("Score:" + score)) / 2,
+                graphic.getFont().getSize());
+
+        // to display the gameover text
+        graphic.setColor(Color.YELLOW);
+        graphic.setFont(new Font("Comic Sans", Font.BOLD, 80));
+        FontMetrics f2 = getFontMetrics(graphic.getFont());
+        graphic.drawString("GAME OVER!", (width - f2.stringWidth("GAME OVER!")) / 2, height / 2);
+
+        // to display the replay prompt
+        graphic.setColor(Color.GREEN);
+        graphic.setFont(new Font("Comic Sans", Font.BOLD, 40));
+        graphic.drawString("Press R to replay", (width - f.stringWidth("Press R to replay")) / 2, height / 2 + 150);
+    }
+
+    public void checkhit() {
+        if (xsnake[0] < 0) {
+            flag = false;
+        } else if (xsnake[0] > 1200) {
+            flag = false;
+        } else if (ysnake[0] < 0) {
+            flag = false;
+        } else if (ysnake[0] > 600) {
+            flag = false;
+        }
+
+        for (int i = length; i > 0; i--) {
+            if (xsnake[0] == xsnake[i] && ysnake[0] == ysnake[i]) {
+                flag = false;
+            }
+        }
+
+        if (!flag) {
+            timer.stop();
+        }
+    }
+
+    public void eat() {
+        if (xsnake[0] == foodx && ysnake[0] == foody) {
+            length++;
+            score++;
+            spawnfood();
+        }
+    }
+
+    public void move() {
+        for (int i = length; i > 0; i--) {
+            xsnake[i] = xsnake[i - 1];
+            ysnake[i] = ysnake[i - 1];
+        }
+
+        switch (dir) {
+            case 'R':
+                xsnake[0] = xsnake[0] + unit;
+                break;
+            case 'L':
+                xsnake[0] = xsnake[0] - unit;
+                break;
+            case 'D':
+                ysnake[0] = ysnake[0] + unit;
+                break;
+            case 'U':
+                ysnake[0] = ysnake[0] - unit;
+                break;
+        }
+    }
+
+    public class myKey extends KeyAdapter {
+        public void keyPressed(KeyEvent evt) {
+            switch (evt.getKeyCode()) {
+                case KeyEvent.VK_UP:
+                    if (dir != 'D') {
+                        dir = 'U';
+                    }
+                    break;
+                case KeyEvent.VK_DOWN:
+                    if (dir != 'U') {
+                        dir = 'D';
+                    }
+                    break;
+                case KeyEvent.VK_LEFT:
+                    if (dir != 'R') {
+                        dir = 'L';
+                    }
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    if (dir != 'L') {
+                        dir = 'R';
+                    }
+                    break;
+                case KeyEvent.VK_R:
+                    if (!flag) {
+                        score = 0;
+                        length = 3;
+                        dir = 'R';
+                        Arrays.fill(xsnake, 0);
+                        Arrays.fill(ysnake, 0);
+
+                        gamestart();
+                    }
+                    break;
+
+            }
+        }
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if (flag) {
+            move();
+            eat();
+            checkhit();
+        }
+        repaint();
+    }
+}
+0 comments on commit 0af1ea6
+@AtulThorat147
+ 
+Add heading textAdd bold text, <Ctrl+b>Add italic text, <Ctrl+i>
+Add a quote, <Ctrl+Shift+.>Add code, <Ctrl+e>Add a link, <Ctrl+k>
+Add a bulleted list, <Ctrl+Shift+8>Add a numbered list, <Ctrl+Shift+7>Add a task list, <Ctrl+Shift+l>
+Directly mention a user or team
+Reference an issue, pull request, or discussion
+Add saved reply
+Leave a comment
+No file chosen
+Attach files by dragging & dropping, selecting or pasting them.
+Styling with Markdown is supported
+ You’re not receiving notifications from this thread.
+Footer
+© 2023 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Copied!
